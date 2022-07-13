@@ -22,7 +22,7 @@
 
 ## About The Project
 
-Followork front is the frontend part of an application activity tracking app in order for managers 
+FolloworkFrontEnd is the frontend part of an application activity tracking app in order for managers 
 to have a central view and a control on their employees work activity.
 
 It therefore allows each employee of the company to be able to fill in their tasks and projects in the application.
