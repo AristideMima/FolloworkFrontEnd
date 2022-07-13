@@ -1,0 +1,19 @@
+<nb-card size="large">
+  <nb-tabset fullWidth (changeTab)="changeTab($event)">
+    <nb-tab tabTitle="Dossiers de crédit">
+      <div class="chart-container">
+        <ngx-chart-panel-summary [type] = "'credit'"></ngx-chart-panel-summary>
+<!--        <ngx-chart-panel-header [type]="period" (periodChange)="setPeriodAndGetChartData($event)"></ngx-chart-panel-header>-->
+<!--        <ngx-orders-chart #ordersChart [ordersChartData]="ordersChartData"></ngx-orders-chart>-->
+        <ngx-profit-chart ></ngx-profit-chart>
+      </div>
+    </nb-tab>
+    <nb-tab tabTitle="Etudes / Projets" [lazyLoad]="true">
+      <div class="chart-container">
+        <ngx-chart-panel-summary  [type] = "'etude'"></ngx-chart-panel-summary>
+<!--        <ngx-chart-panel-header [type]="period" (periodChange)="setPeriodAndGetChartData($event)"></ngx-chart-panel-header>-->
+        <ngx-profit-chart ></ngx-profit-chart>
+      </div>
+    </nb-tab>
+  </nb-tabset>
+</nb-card>

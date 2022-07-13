@@ -1,0 +1,21 @@
+<div class="col-12">
+  <h2> Historique de suivi - Nom : {{name}} </h2>
+  <p> Retrouvez ici l'historique de toutes les actions entreprises lors sur ce dossier. </p>
+  <nz-divider nzType="horizontal"></nz-divider>
+</div>
+
+<div *ngIf="datas.length !== 0">
+  <div class="row" >
+    <div class="col-md-3">Utilisateur</div>
+    <div class="col-md-3">Action</div>
+    <div class="col-md-3">Commentaire</div>
+    <div class="col-md-3">Date de l'action</div>
+  </div>
+  <div class="row" *ngFor="let etud of datas">
+    <nz-divider nzType="horizontal"></nz-divider>
+    <div class="col-md-3">{{etud[0].username}}</div>
+    <div class="col-md-3">{{status_dossier[etud[0].status]}}</div>
+    <div class="col-md-3">{{etud[0].comment}}</div>
+    <div class="col-md-3">{{formatDate(etud[0].createdAt)}}</div>
+  </div>
+</div>

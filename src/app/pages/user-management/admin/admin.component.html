@@ -1,0 +1,228 @@
+<div class="col-12">
+  <h2> Gestion des utilisateurs </h2>
+  <p>Interface permettant d'administrer les utilisateurs de la plateforme</p>
+  <nz-divider nzType="horizontal"></nz-divider>
+</div>
+
+
+<div class="col-12" *ngIf="user_edit !== val_undefined">
+  <nz-space [nzSize]="'large'">
+    <nz-modal [(nzVisible)]="modalEditVisible" nzTitle="Modification de l'utilisateur" (nzOnCancel)="handleCancelEdit()" [nzWidth]="550">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormEdit" (ngSubmit)="submitFormEdit()"  class="login-form">
+          <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="firstNameEdit"
+              nzRequired
+            >
+              <span>Nom</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your firstName!">
+              <nz-input-group [nzPrefixIcon]="'user'">
+                <input  nz-input id="firstNameEdit" formControlName="firstNameEdit" placeholder="Nom" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="lastName"
+              nzRequired
+            >
+              <span>Prénom</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input the lastName!">
+              <nz-input-group [nzPrefixIcon]="'user'">
+                <input  nz-input id="lastNameEdit" formControlName="lastNameEdit" placeholder="Prénom" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzR equired nzFor="email">E-mail</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="The input is not valid E-mail!">
+              <nz-input-group [nzPrefixIcon]="'mail'">
+                <input nz-input formControlName="emailEdit" id="emailEdit" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="rolesEdit"
+              nzRequired
+            >
+              <span>Roles</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Choisir les rôles!">
+              <!--              <input nz-input id="roles" formControlName="roles" />-->
+              <nz-select  formControlName="rolesEdit"  [nzSize]="size" nzMode="multiple" nzPlaceHolder="Please select">
+                <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Mettre à jour</button>
+        </form>
+      </div>
+      <div *nzModalFooter style="text-align: center">
+        <!--        <button nz-button nzType="primary" (click)="handleOkAdd()" >Ajouter</button>-->
+      </div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<div class="col-12" *ngIf="modalAddVisible">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalAddVisible" nzTitle="Ajouter un utilisateur" (nzOnCancel)="handleCancelAdd()" [nzWidth]="550">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormAdd" (ngSubmit)="submitForm()"  class="login-form">
+          <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="firstName"
+              nzRequired
+            >
+              <span>Nom</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your firstName!">
+              <nz-input-group [nzPrefixIcon]="'user'">
+                <input  nz-input id="firstName" formControlName="firstName" placeholder="Nom" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="lastName"
+              nzRequired
+            >
+              <span>Prénom</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input the lastName!">
+              <nz-input-group [nzPrefixIcon]="'user'">
+                <input  nz-input id="lastName" formControlName="lastName" placeholder="Prénom" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="username"
+              nzRequired
+            >
+              <span>Nom d'utilisateur</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input the username!">
+              <nz-input-group [nzPrefixIcon]="'user'">
+                <input  nz-input id="username" formControlName="username" placeholder="Nom d'utilisateur" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzR equired nzFor="email">E-mail</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="The input is not valid E-mail!">
+              <nz-input-group [nzPrefixIcon]="'mail'">
+                <input nz-input formControlName="email" id="email" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label
+              [nzSm]="6"
+              [nzXs]="24"
+              nzFor="roles"
+              nzRequired
+            >
+              <span>Roles</span>
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Choisir les rôles!">
+              <!--              <input nz-input id="roles" formControlName="roles" />-->
+              <nz-select [(ngModel)]="singleValue" formControlName="roles"  [nzSize]="size" nzMode="multiple" nzPlaceHolder="Please select">
+                <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>Password</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your password!">
+              <input
+                nz-input
+                type="password"
+                id="password"
+                formControlName="password"
+                (ngModelChange)="updateConfirmValidator()"
+              />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>Confirm Password: </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="errorTpl">
+              <input nz-input type="password" formControlName="checkPassword" id="checkPassword" />
+              <ng-template #errorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please confirm your password!</ng-container>
+                <ng-container *ngIf="control.hasError('confirm')">
+                  Two passwords that you enter is inconsistent!
+                </ng-container>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Enregistrer</button>
+        </form>
+      </div>
+      <div *nzModalFooter style="text-align: center">
+        <!--        <button nz-button nzType="primary" (click)="handleOkAdd()" >Ajouter</button>-->
+      </div>
+    </nz-modal>
+  </nz-space>
+</div>
+<div class="col-12">
+  <button style="margin-top: 20px" nz-button nzSize="20" nzType="primary" (click)="showModalAdd()"> <i nz-icon nzType="user-add" nzTheme="outline"></i> Ajouter un utilisateur</button>
+</div>
+
+<div class="col-12" id="data-table" style="margin-top: 20px">
+  <nz-table [nzTitle]="tableTitle " [nzLoading]="loading"  #groupingTable [nzData]="users" nzBordered nzSize="middle" [nzOuterBordered]="true"  [nzPageSize]="50" [nzScroll]="{ x: '800px', y: '240px' }">
+    <thead>
+    <tr>
+      <th nzWidth="10" style="text-align:center">Id</th>
+      <th nzWidth="50" style="text-align:center" >Nom d'utilisateur</th>
+      <th nzWidth="50" style="text-align:center" >Email</th>
+      <th nzWidth="50" style="text-align:center">Nom</th>
+      <th nzWidth="50" style="text-align:center" >Prénom</th>
+      <th nzWidth="50" style="text-align:center" >Roles</th>
+      <th style="text-align:center" ></th>
+      <th style="text-align:center" ></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of groupingTable.data">
+      <td style="text-align:center" >{{data.id}}</td>
+      <td style="text-align:center" >{{data.username}}</td>
+      <td style="text-align:center" >{{data.email}}</td>
+      <td style="text-align:center" >{{data.firstName}}</td>
+      <td style="text-align:center" >{{data.lastName}}</td>
+      <td style="text-align:center" >
+        <div *ngFor="let role of data.roles">
+          <span>{{role.name}}</span> <br />
+        </div>
+      </td>
+      <td style="text-align: center">
+        <button (click)="editUser(data.id)" nz-button nzType="primary" style="background-color: black; color: white" nzSize="20"><i nz-icon nzType="edit" nzTheme="outline"></i></button>
+      </td>
+      <td style="text-align: center">
+        <button nzType="primary" nzDanger nzSize="20" (click)="confirmDelete(data.id)"  nz-button><i nz-icon nzType="delete" nzTheme="outline"></i></button>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+</div>
+

@@ -1,0 +1,23 @@
+<div class="col-12">
+  <h4> Dossiers Enregistrés Par {{ lastName | uppercase }} {{ firstName | uppercase }} </h4>
+  <nz-divider nzType="horizontal"></nz-divider>
+</div>
+<nb-card size="large">
+  <nb-tabset fullWidth>
+    <nb-tab tabTitle="Dossiers de crédit">
+      <div class="chart-container">
+        <ngx-chart-panel-summary  [type] = "'credit'" [username]="username"></ngx-chart-panel-summary>
+                <ngx-orders-chart [type] = "'credit'" [username]="username" ></ngx-orders-chart>
+<!--        <ngx-profit-chart ></ngx-profit-chart>-->
+      </div>
+    </nb-tab>
+    <nb-tab tabTitle="Etudes / Projets" [lazyLoad]="true">
+      <div class="chart-container">
+        <ngx-chart-panel-summary  [type] = "'etude'" [username]="username" ></ngx-chart-panel-summary>
+        <!--        <ngx-chart-panel-header [type]="period" (periodChange)="setPeriodAndGetChartData($event)"></ngx-chart-panel-header>-->
+        <ngx-orders-chart [type] = "'etude'" [username]="username" ></ngx-orders-chart>
+<!--        <ngx-profit-chart ></ngx-profit-chart>-->
+      </div>
+    </nb-tab>
+  </nb-tabset>
+</nb-card>

@@ -1,0 +1,770 @@
+<div class="col-12">
+  <h2> Mes Dossiers de Crédits </h2>
+  <p> Retrouvez tous vos dossiers de crédits enregistrés sur la plateforme </p>
+  <nz-divider nzType="horizontal"></nz-divider>
+</div>
+
+
+<div class="col-12">
+  <button style="margin-top: 20px"  (click)="showModalAdd()" nz-button nzSize="20" nzType="primary"> <i nz-icon nzType="folder-add" nzTheme="outline"></i> Nouveau Dossier </button>
+</div>
+
+<!-- Modal for adding new Credit -->
+<div class="col-12" *ngIf="modalAddVisible">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalAddVisible" nzTitle="Nouveau dossier de crédit" (nzOnCancel)="handleCancelAdd()" [nzWidth]="900">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormAdd" (ngSubmit)="submitForm()"   class="login-form">
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="analyst" nzRequired>
+                  <span>Analyste </span>
+                </nz-form-label>
+                <nz-form-control  nzErrorTip="L'analyste doit être différent du supérieur et ne doit pas figurer dans la liste des supports !">
+                  <nz-select nzShowSearch nzAlowClear (ngModelChange)="updateValidator('analyst')"  formControlName="analyst"  [nzSize]="'default'"  nzPlaceHolder="Analyste principal">
+                    <nz-option *ngFor="let option of userService.listOfOptionAnalyst" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+                <nz-form-label
+                  nzFor="name"
+                  nzRequired
+                  [nzSm]="6"
+                >
+                  <span>Nom</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Le nom du dossier est obligatoire et doit être unique">
+                  <nz-input-group [nzPrefixIcon]="'pic-right'">
+                    <input  nz-input id="name" formControlName="name" placeholder="Nom du dossier" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="origin" nzRequired>
+                  <span>Origine</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez la structure d'origine">
+                  <nz-input-group *ngIf="validateFormAdd.controls.provenance.value === 'EXTERNE'" >
+                    <input type="text"  nz-input id="origin" formControlName="origin" placeholder="Structure d'origine du dossier" />
+                  </nz-input-group>
+                  <nz-select nzShowSearch nzAllowClear *ngIf="validateFormAdd.controls.provenance.value !== 'EXTERNE'" formControlName="origin"  [nzSize]="'default'"  nzPlaceHolder="Structure d'origine de l'étude / projet">
+                    <nz-option *ngFor="let option of userService.listOfOptionOrigin" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label [nzSm]="6" nzFor="first_cote" nzRequired>
+                  <span>Cotation</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Nom de la première personne qui cote">
+                  <nz-input-group [nzPrefixIcon]="'user'">
+                    <input  nz-input id="first_cote" formControlName="first_cote" placeholder="Nom de la première personne qui cote" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label [nzSm]="6" nzFor="provenance" nzRequired>
+                  <span>Provenance</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Sélectionner la provenance">
+                  <nz-select nzShowSearch nzAllowClear formControlName="provenance"  [nzSize]="'default'"  nzPlaceHolder="Provenance">
+                    <nz-option *ngFor="let option of userService.listOfOptionProvenance" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="domain" nzRequired>
+                  <span>Secteur</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisissez le secteur du dossier">
+                  <nz-input-group [nzPrefixIcon]="'pic-right'">
+                    <input  nz-input id="domain" formControlName="domain" placeholder="Secteur d'activité" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="recipients"
+                  nzRequired
+                >
+                  <span>Destinataires</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisissez le(s) Destinataire(s)">
+                  <nz-input-group [nzPrefixIcon]="'user'">
+                    <input  nz-input id="recipients" formControlName="recipients" placeholder="Destinataire(s)" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item>
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="supports"
+                >
+                  <span>Supports</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Le support doit être différent de l'analyste">
+                  <nz-select nzShowSearch nzAllowClear (ngModelChange)="updateValidator('supports')" nzMode="multiple" formControlName="supports" [nzSize]="'default'"[nzPlaceHolder]="'Supports du dossier'">
+                    <nz-option *ngFor="let option of userService.listOfOptionAnalyst" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="start_date"
+                  nzRequired
+                >
+                  <span>Date Début</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Doit être inférieure à la date probable de fin et supérieure ou égale à la date courante">
+                  <nz-date-picker (ngModelChange)="updateValidator('start_date')"  id="start_date" formControlName="start_date" placeholder="Date de début" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="expected_end_date"
+                  nzRequired
+                >
+                  <span>Fin Probable</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Doit être  plus grande que la date de début et ne pas dépasser 12 mois">
+                  <nz-date-picker (ngModelChange)="updateValidator('expected_end_date')" id="expected_end_date" formControlName="expected_end_date" [nzPlaceHolder]="'Date de fin probable'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="ack_date"
+                  nzRequired
+                >
+                  <span>Accusé</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez la date de l'accusé">
+                  <nz-date-picker (ngModelChange)="updateValidator('ack_date')" id="ack_date" formControlName="ack_date" [nzPlaceHolder]="'Date accusé de réception'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="deliverables" nzRequired>
+                  <span>Livrables </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisir la liste des livrables">
+                  <nz-input-group >
+                    <textarea  nz-input id="deliverables" formControlName="deliverables" placeholder="Liste des livrables attendus" ></textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="needed_reason" nzRequired>
+                  <span>Besoin </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisir la raison du financement">
+                  <nz-input-group >
+                    <input nz-input id="needed_reason"  formControlName="needed_reason" placeholder="Raison du financement" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="deliverables" nzRequired>
+                  <span>Montant </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le montant demandé par le client">
+                  <nz-input-group >
+                    <input type="number" nz-input id="neededAmount"  formControlName="neededAmount" placeholder="Montant demandé" nzRequired />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <nz-form-item>
+                <nz-form-label
+                  nzFor="usernameManager"
+                  nzRequired
+                  [nzSm]="3"
+                >
+                  <span>Supérieur </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Le supérieur doit être différent de l'analyste" >
+                  <nz-select  nzShowSearch nzAllowClear (ngModelChange)="updateValidator('manager')" formControleLabel="manager"  formControlName="usernameManager"  [nzSize]="'default'"  nzPlaceHolder="Supérieur à qui transmettre l'étude">
+                    <nz-option *ngFor="let option of userService.listOfOptionManager" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Enregistrer</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<!-- Modal for editing a Credit -->
+<div class="col-12" *ngIf="modalEditVisible">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalEditVisible" nzTitle="Modification du dossier de crédit" (nzOnCancel)="handleCancelAdd('edit')" [nzWidth]="900">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormEdit" (ngSubmit)="submitForm(false)"   class="login-form">
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="analystEdit" nzRequired>
+                  <span>Analyste </span>
+                </nz-form-label>
+                <nz-form-control  nzErrorTip="L'analyste doit être différent du supérieur et ne doit pas figurer dans la liste des supports !">
+                  <nz-select [nzDisabled]="true" nzShowSearch nzAllowClear (ngModelChange)="updateValidator('analyst', false)"  formControlName="analystEdit"  [nzSize]="'default'"  nzPlaceHolder="Analyste principal">
+                    <nz-option *ngFor="let option of userService.listOfOptionAnalyst" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+                <nz-form-label
+                  nzFor="nameEdit"
+                  nzRequired
+                  [nzSm]="6"
+                >
+                  <span>Nom</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le nom du dossier">
+                  <nz-input-group [nzPrefixIcon]="'pic-right'">
+                    <input  nz-input id="nameEdit" formControlName="nameEdit" placeholder="Nom du dossier" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="originEdit" nzRequired>
+                  <span>Origine</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez la structure d'origine">
+                  <nz-input-group *ngIf="validateFormAdd.controls.provenance.value === 'EXTERNE'" >
+                    <input type="text"  nz-input id="originEdit" formControlName="originEdit" placeholder="Structure d'origine du dossier" />
+                  </nz-input-group>
+                  <nz-select nzShowSearch nzAllowClear *ngIf="validateFormAdd.controls.provenance.value !== 'EXTERNE'" formControlName="originEdit"  [nzSize]="'default'"  nzPlaceHolder="Structure d'origine de l'étude / projet">
+                    <nz-option *ngFor="let option of userService.listOfOptionOrigin" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label [nzSm]="6" nzFor="first_coteEdit" nzRequired>
+                  <span>Cotation</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Nom de la première personne qui cote">
+                  <nz-input-group [nzPrefixIcon]="'user'">
+                    <input  nz-input id="first_coteEdit" formControlName="first_coteEdit" placeholder="Nom de la première personne qui cote" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label [nzSm]="6" nzFor="provenanceEdit" nzRequired>
+                  <span>Provenance</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Sélectionner la provenance">
+                  <nz-select nzShowSearch nzAllowClear formControlName="provenanceEdit"  [nzSize]="'default'"  nzPlaceHolder="Provenance">
+                    <nz-option *ngFor="let option of userService.listOfOptionProvenance" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="domainEdit" nzRequired>
+                  <span>Secteur</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisissez le secteur du dossier">
+                  <nz-input-group [nzPrefixIcon]="'pic-right'">
+                    <input  nz-input id="domainEdit" formControlName="domainEdit" placeholder="Secteur d'activité" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="recipientsEdit"
+                  nzRequired
+                >
+                  <span>Destinataires</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisissez le(s) Destinataire(s)">
+                  <nz-input-group [nzPrefixIcon]="'user'">
+                    <input  nz-input id="recipientsEdit" formControlName="recipientsEdit" placeholder="Destinataire(s)" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item>
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="supportsEdit"
+                >
+                  <span>Supports</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Le support doit être différent de l'analyste">
+                  <nz-select nzShowSearch nzAllowClear (ngModelChange)="updateValidator('supports', false)" nzMode="multiple" formControlName="supportsEdit" [nzSize]="'default'"[nzPlaceHolder]="'Supports du dossier'">
+                    <nz-option *ngFor="let option of userService.listOfOptionAnalyst" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="start_dateEdit"
+                  nzRequired
+                >
+                  <span>Date Début</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Doit être inférieure à la date probable de fin et supérieure ou égale à la date courante">
+                  <nz-date-picker (ngModelChange)="updateValidator('start_date', false)"  id="start_date" formControlName="start_dateEdit" placeholder="Date de début" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="expected_end_dateEdit"
+                  nzRequired
+                >
+                  <span>Fin Probable</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Doit être  plus grande que la date de début et ne pas dépasser 12 mois">
+                  <nz-date-picker (ngModelChange)="updateValidator('expected_end_date', false)" id="expected_end_date" formControlName="expected_end_dateEdit" [nzPlaceHolder]="'Date de fin probable'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  nzFor="ack_dateEdit"
+                  nzRequired
+                >
+                  <span>Accusé</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez la date de l'accusé">
+                  <nz-date-picker (ngModelChange)="updateValidator('ack_date', false)" id="ack_dateEdit" formControlName="ack_dateEdit" [nzPlaceHolder]="'Date accusé de réception'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="deliverablesEdit" nzRequired>
+                  <span>Livrables </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisir la liste des livrables">
+                  <nz-input-group >
+                    <textarea  nz-input id="deliverablesEdit" formControlName="deliverablesEdit" placeholder="Liste des livrables attendus" ></textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="needed_reasonEdit" nzRequired>
+                  <span>Besoin </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Saisir la raison du financement">
+                  <nz-input-group >
+                    <input nz-input id="needed_reasonEdit"  formControlName="needed_reasonEdit" placeholder="Raison du financement" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="deliverablesEdit" nzRequired>
+                  <span>Montant </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le montant demandé par le client">
+                  <nz-input-group >
+                    <input type="number" nz-input id="neededAmountEdit"  formControlName="neededAmountEdit" placeholder="Montant demandé" nzRequired />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <nz-form-item>
+                <nz-form-label
+                  nzFor="usernameManagerEdit"
+                  nzRequired
+                  [nzSm]="3"
+                >
+                  <span>Supérieur </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Le supérieur doit être différent de l'analyste" >
+                  <nz-select  [nzDisabled]="true" nzShowSearch nzAllowClear (ngModelChange)="updateValidator('manager', false)" formControleLabel="managerEdit"  formControlName="usernameManagerEdit"  [nzSize]="'default'"  nzPlaceHolder="Supérieur à qui transmettre l'étude">
+                    <nz-option *ngFor="let option of userService.listOfOptionManager" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Enregistrer</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<!-- Modal to show an Credit details -->
+<div class="col-12" *ngIf="credit_show !== undefined">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalShowDetails" nzTitle="Détails du dossier" (nzOnCancel)="handleCancelAdd('details')" [nzWidth]="800">
+      <div *nzModalContent >
+        <div class="row">
+          <div class="col-12">
+            <cdk-virtual-scroll-viewport  class="demo-infinite-container">
+              <nz-list nzBordered nzHeader="Détail du dossier" nzSize="small">
+                <nz-list-item><span nz-typography>Nom: </span>{{credit_show[0].name}}</nz-list-item>
+                <nz-list-item><span nz-typography>Code: </span>{{credit_show[0].genericCode}}</nz-list-item>
+                <nz-list-item><span nz-typography>Analyste: </span>{{credit_show[0].userAnalyst.firstName}} {{credit_show[0].userAnalyst.lastName}}</nz-list-item>
+                <nz-list-item><span nz-typography>Supérieur: </span>{{credit_show[0].userManager.firstName}} {{credit_show[0].userManager.lastName}}</nz-list-item>
+                <nz-list-item><span nz-typography>Supports: </span>
+                  <span>
+                     <div *ngFor="let support of credit_show[0].supports">
+                      {{support.firstName}} {{support.lastName}}
+                    </div>
+                  </span>
+                </nz-list-item>
+                <nz-list-item><span nz-typography>Provenance & Demandeur </span>{{credit_show[0].provenance}} & {{userService.formatDirection(credit_show[0].origin)}} </nz-list-item>
+                <nz-list-item><span nz-typography>Besoin  </span>{{credit_show[0].needed_reason}} </nz-list-item>
+                <nz-list-item><span nz-typography>Montant demandé </span>{{credit_show[0].neededAmount | number:'':'fr-FR'}} </nz-list-item>
+                <nz-list-item><span nz-typography>Livrables attendus: </span> {{credit_show[0].deliverables}}</nz-list-item>
+                <nz-list-item><span nz-typography> Destinataires </span>{{credit_show[0].recipients}} </nz-list-item>
+                <nz-list-item><span nz-typography>Date de demande d'initiation le & Fin probable </span>{{userService.formatDate(credit_show[0].start_date)}} & {{userService.formatDate(credit_show[0].expected_end_date)}}</nz-list-item>
+              </nz-list>
+              <nz-list nzBordered nzHeader="Détail de l'analyse" nzSize="small">
+                <nz-list-item><span nz-typography>Statut actuel: </span> {{dossier_enum[credit_show[1].status]}}</nz-list-item>
+                <nz-list-item><span nz-typography>Montant accordé: </span> {{credit_show[1].amount_given | number: '':'fr-FR' }}</nz-list-item>
+                <nz-list-item><span nz-typography>Lien: </span> <a href="{{ credit_show[1].link}}">{{ credit_show[1].link}}</a> </nz-list-item>
+                <nz-list-item><span nz-typography>Perspectives: </span> {{credit_show[1].perspectives}}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de validation pour initiation  : </span> {{ userService.formatDate(credit_show[1].date_validation) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de rejet  : </span> {{ userService.formatDate(credit_show[1].date_validation) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date d'initiation de cloture  : </span> {{ userService.formatDate(credit_show[1].date_init_close) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de passage comité DRI  : </span> {{ userService.formatDate(credit_show[1].date_comity_dri) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de passage au grand comité  : </span> {{ userService.formatDate(credit_show[1].date_comity_great) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de transmission au DCE/Risque/Conformité   : </span> {{ userService.formatDate(credit_show[1].date_transmit) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de Mise en place   : </span> {{ userService.formatDate(credit_show[1].date_establishment) }}</nz-list-item>
+              </nz-list>
+            </cdk-virtual-scroll-viewport>
+          </div>
+        </div>
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<!-- Modal to edit an Analyse -->
+<div class="col-12" *ngIf="modalUpdateAnalysis">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalUpdateAnalysis" nzTitle="Analyse de l'étude" (nzOnCancel)="handleCancelAdd('analysis')" [nzWidth]="900">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormEditAnalyse"  class="login-form">
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="link">
+                  <span>Lien livrable </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le lien vers les livrables">
+                  <nz-input-group [nzPrefixIcon]="'pic-right'">
+                    <input  nz-input id="link" formControlName="link" placeholder="Lien vers les livrables" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item [nzSpan]="24"  style="margin-bottom: 12px">
+                <nz-form-label
+                  nzFor="perspectives"
+                  [nzSm]="6"
+                >
+                  <span>Perspectives</span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez les perspectives de l'étude">
+                  <nz-input-group>
+                    <textarea  nz-input id="perspectives" formControlName="perspectives" placeholder="Perspectives de l'étude" ></textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="date_comity_dri"
+                >
+                  <span>Comité DRI</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez une date de passage au comité DRI">
+                  <nz-date-picker id="date_comity_dri" formControlName="date_comity_dri" [nzPlaceHolder]="'Date passage comité DRI'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="8" nzFor="amount_given">
+                  <span> Montant accordé </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez un montant valide">
+                  <nz-input-group [nzPrefixIcon]="'money-collect'">
+                    <input type="number"  nz-input id="amount_given" formControlName="amount_given" placeholder="Montant du finacement accordé" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="date_transmit"
+                >
+                  <span>Transmision</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez la date de transmission DCE/Risque/Conformité ">
+                  <nz-date-picker id="date_transmit" formControlName="date_transmit" [nzPlaceHolder]="'Date transmission - DCE/Risque/Conformité '" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="date_comity_great"
+                >
+                  <span>Grand comité</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez une date de passage au grand comité">
+                  <nz-date-picker id="date_comity_great" formControlName="date_comity_great" [nzPlaceHolder]="'Date passage au grand comité'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <nz-form-item  style="margin-bottom: 12px">
+                <nz-form-label
+                  [nzSm]="6"
+                  [nzXs]="24"
+                  nzFor="date_establishment"
+                >
+                  <span>Grand comité</span>
+                </nz-form-label>
+                <nz-form-control [nzSpan]="24" nzErrorTip="Entrez la date de mise en place">
+                  <nz-date-picker id="date_establishment" formControlName="date_establishment" [nzPlaceHolder]="'Date de mise en place'" ></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div class="col-md-6">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="comment">
+                  <span> Commentaire </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le lien vers les livrables">
+                  <nz-input-group>
+                    <textarea  nz-input id="comment" formControlName="comment" placeholder="Commentaires supplémentaires" >
+                    </textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <button nz-button class="login-form-button login-form-margin" (click)="submitFormEditAnalysis()"
+                      [nzType]="'primary'">Mettre à jour</button>
+            </div>
+            <div class="col-md-6">
+              <button nz-button class="login-form-button login-form-margin" (click)="submitFormEditAnalysis('close')" [nzType]="'danger'">Mettre à jour et initier la cloture</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<!-- Modal to suspend analysis -->
+<div class="col-12" *ngIf="modalSuspend">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalSuspend" nzTitle="Suspension de l'analyse de l'étude  {{action}}" (nzOnCancel)="handleCancelAdd('suspend')" [nzWidth]="900">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormSuspend" (ngSubmit)="submitFormSuspend()"   class="login-form">
+          <div class="row">
+            <div class="col-md-12">
+              <nz-form-item >
+                <nz-form-label [nzSm]="6" nzFor="commentSuspend" nzRequired>
+                  <span> Raison de la suspension </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez la raison">
+                  <nz-input-group>
+                    <textarea  nz-input id="commentSuspend" formControlName="commentSuspend" placeholder="Saisir la raison de la demande de suspension" nzRequired>
+                    </textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <button nzValue="small" nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Demande de suspension</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+
+<!-- Modal for the Table -->
+<div class="col-12" id="data-table" style="margin-top: 20px">
+  <nz-table [nzTitle]="tableTitle " [nzAlign]="'center'" [nzLoading]="loading"  #groupingTable [nzData]="allCredits" nzBordered nzSize="middle" [nzOuterBordered]="true"  [nzPageSize]="200" [nzScroll]="{ x: '1500px', y: '300px' }">
+    <thead>
+    <tr>
+      <th
+        style="text-align: center"
+        [nzRight]="column.right"
+        *ngFor="let column of listOfColumns"
+        [nzSortOrder]="column.sortOrder"
+        [nzSortFn]="column.sortFn"
+        [nzSortDirections]="column.sortDirections"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzFilterFn]="column.filterFn"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of groupingTable.data; let i = index">
+      <td style="text-align:center;">{{data[0].genericCode}}</td>
+      <td style="text-align:center" >{{data[0].name}}</td>
+      <td style="text-align:center"  >{{data[0].userAnalyst.username}}</td>
+      <td style="text-align:center"  >{{data[0].domain}}</td>
+      <td style="text-align:center" >{{data[0].origin}}</td>
+      <td style="text-align:center"  >{{data[0].userManager.username}}</td>
+      <td style="text-align:center"  >
+        <div *ngFor="let support of data[0].supports">
+          <span>{{support.username}}</span> <br />
+        </div>
+      </td>
+      <td style="text-align:center" nzRight>
+        <nz-tag [nzColor]="'blue'">
+          {{dossier_enum[data[1].status]}}
+        </nz-tag>
+      </td>
+      <td style="text-align: center;" nzRight>
+        <button nz-button nz-dropdown [nzDropdownMenu]="actionMenu">
+          Action
+          <i nz-icon nzType="down"></i>
+        </button>
+
+        <nz-dropdown-menu #actionMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li (click)="tableAction('details', i)" nz-menu-item>Détails </li>
+            <li (click)="tableAction('delete', i)" *ngIf="data[1].status === 'INIT_DEMAND'" nz-menu-item> Supprimer </li>
+            <li (click)="tableAction('modify', i)" *ngIf="['INIT_DEMAND', 'INIT_REJECT'].includes(data[1].status)"   nz-menu-item>Modifier le dossier</li>
+            <li (click)="tableAction('suspend', i)" *ngIf="data[1].status === 'IN_PROGRESS'"   nz-menu-item>Suspendre l'analyse</li>
+            <li (click)="tableAction('update', i)" *ngIf="data[1].status === 'IN_PROGRESS'" nz-menu-item>Analyse</li>
+            <li (click)="tableAction('monitor', i)" nz-menu-item>Historique suivi</li>
+          </ul>
+        </nz-dropdown-menu>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+</div>

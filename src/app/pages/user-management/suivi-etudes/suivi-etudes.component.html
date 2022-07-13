@@ -1,0 +1,148 @@
+<div class="col-12">
+  <h2> Etudes / Projet - Suivi </h2>
+  <p> Toutes les études / projet  que vous suivez </p>
+  <nz-divider nzType="horizontal"></nz-divider>
+</div>
+
+<!-- Modal for validate and add commment -->
+<div class="col-12" *ngIf="modalComment">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalComment" nzTitle="Mise à jour du statut. Nom: {{name}}.  Action : {{dict_values[action]}}" (nzOnCancel)="handleCancelEditComment()" [nzWidth]="900">
+      <div *nzModalContent style="text-align: justify-all">
+        <form nz-form [formGroup]="validateFormAddComment" (ngSubmit)="submitFormComment()"   class="login-form">
+          <div class="row">
+            <div class="col-md-12">
+              <nz-form-item >
+                <nz-form-label [nzSm]="3" nzFor="comment">
+                  <span> Commentaire </span>
+                </nz-form-label>
+                <nz-form-control nzErrorTip="Entrez le commentaire">
+                  <nz-input-group>
+                    <textarea (ngModelChange)="updateFormValidatorComment()"  nz-input id="comment" formControlName="comment" placeholder="Commentaires sur le statut" >
+                    </textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Mettre à jour le statut</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<!-- Modal to show an Etude details -->
+<div class="col-12" *ngIf="modalShowDetails">
+  <nz-space [nzSize]="'large'" >
+    <nz-modal [(nzVisible)]="modalShowDetails" nzTitle="Détails" (nzOnCancel)="handleCancelShow()" [nzWidth]="800">
+      <div *nzModalContent >
+        <div class="row">
+          <div class="col-12">
+            <cdk-virtual-scroll-viewport style="height: 80px" itemSize="1" class="demo-infinite-container">
+              <nz-list nzBordered nzHeader="Détail de l'étude" nzSize="small">
+                <nz-list-item><span nz-typography>Nom : </span>{{etude_show[0].name}}</nz-list-item>
+                <nz-list-item><span nz-typography>Code: </span>{{etude_show[0].genericCode}}</nz-list-item>
+                <nz-list-item><span nz-typography>Analyste: </span>{{etude_show[0].userAnalyst.firstName}} {{etude_show[0].userAnalyst.lastName}}</nz-list-item>
+                <nz-list-item><span nz-typography>Supérieur: </span>{{etude_show[0].userManager.firstName}} {{etude_show[0].userManager.lastName}}</nz-list-item>
+                <nz-list-item><span nz-typography>Supports: </span>
+                  <span>
+                     <div *ngFor="let support of etude_show[0].supports">
+                      {{support.firstName}} {{support.lastName}}
+                    </div>
+                  </span>
+                </nz-list-item>
+                <nz-list-item><span nz-typography>Provenance & Demandeur </span>{{etude_show[0].provenance}} & {{formatDirection(etude_show[0].origin)}} </nz-list-item>
+                <nz-list-item><span nz-typography>Type </span>{{etude_show[0].type}} </nz-list-item>
+                <nz-list-item><span nz-typography>Livrables attendus: </span> {{etude_show[0].deliverables}}</nz-list-item>
+                <nz-list-item><span nz-typography> Destinataires </span>{{etude_show[0].recipients}} </nz-list-item>
+                <nz-list-item><span nz-typography>Date de demande de début le & Fin probable </span>{{formatDate(etude_show[0].start_date)}} & {{formatDate(etude_show[0].expected_end_date)}}</nz-list-item>
+              </nz-list>
+              <nz-list nzBordered nzHeader="Détail de l'analyse" nzSize="small">
+                <nz-list-item><span nz-typography>Statut actuel: </span> {{dossier_enum[etude_show[1].status]}}</nz-list-item>
+                <nz-list-item><span nz-typography>Budget consommé: </span> {{etude_show[1].amount_given | number: '':'fr-FR' }}</nz-list-item>
+                <nz-list-item><span nz-typography>Livrables: </span> {{etude_show[1].deliverables}}</nz-list-item>
+                <nz-list-item><span nz-typography>Lien: </span> {{ etude_show[1].link}}</nz-list-item>
+                <nz-list-item><span nz-typography>Perspectives: </span> {{etude_show[1].perspectives}}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de validation pour initiation  : </span> {{ formatDate(etude_show[1].date_validation) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date de rejet  : </span> {{ formatDate(etude_show[1].date_validation) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date d'initiation de cloture  : </span> {{ formatDate(etude_show[1].date_init_close) }}</nz-list-item>
+                <nz-list-item><span nz-typography>	Date  de passage comité DRI  : </span> {{ formatDate(etude_show[1].date_comity_dri) }}</nz-list-item>
+              </nz-list>
+            </cdk-virtual-scroll-viewport>
+          </div>
+        </div>
+      </div>
+      <div *nzModalFooter style="text-align: center"></div>
+    </nz-modal>
+  </nz-space>
+</div>
+
+<div class="col-12" id="data-table" style="margin-top: 20px">
+  <nz-table [nzTitle]="tableTitle " [nzAlign]="'center'" [nzLoading]="loading"  #groupingTable [nzData]="allEtudes" nzBordered nzSize="middle" [nzOuterBordered]="true"  [nzPageSize]="200" [nzScroll]="{ x: '1500px', y: '300px' }">
+    <thead>
+    <tr>
+      <th
+        style="text-align: center"
+        [nzRight]="column.right"
+        *ngFor="let column of listOfColumns"
+        [nzSortOrder]="column.sortOrder"
+        [nzSortFn]="column.sortFn"
+        [nzSortDirections]="column.sortDirections"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzFilterFn]="column.filterFn"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of groupingTable.data; let i = index">
+      <td style="text-align:center;">{{data[0].genericCode}}</td>
+      <td style="text-align:center" >{{data[0].name}}</td>
+      <td style="text-align:center"  >{{data[0].userAnalyst.username}}</td>
+      <td style="text-align:center"  >{{data[0].domain}}</td>
+      <td style="text-align:center"  >{{data[0].type}}</td>
+      <td style="text-align:center" >{{data[0].origin}}</td>
+      <td style="text-align:center"  >{{data[0].userManager.username}}</td>
+      <td style="text-align:center"  >
+        <div *ngFor="let support of data[0].supports">
+          <span>{{support.username}}</span> <br />
+        </div>
+      </td>
+      <td style="text-align:center" nzRight>
+        <nz-tag [nzColor]="'blue'">
+          {{dossier_enum[data[1].status]}}
+        </nz-tag>
+      </td>
+      <td style="text-align: center;" nzRight>
+        <button nz-button nz-dropdown [nzDropdownMenu]="actionMenu">
+          Action
+          <i nz-icon nzType="down"></i>
+        </button>
+
+        <nz-dropdown-menu #actionMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li (click)="tableAction('details', i)" nz-menu-item>Détails </li>
+            <li (click)="tableAction('monitor', i)" nz-menu-item>Historique suivi</li>
+            <li (click)="tableAction('valid_init', i)" *ngIf="getStatusAction(data[1].status, 'valid_init')" nz-menu-item>Valider l'initiation</li>
+            <li (click)="tableAction('cancel_init', i)" *ngIf="getStatusAction(data[1].status, 'cancel_init')" nz-menu-item>Invalider l'initiation</li>
+            <li (click)="tableAction('cancel_suspend', i)" *ngIf="getStatusAction(data[1].status, 'suspend')" nz-menu-item>Rejeter la suspension</li>
+              <li (click)="tableAction('valid_suspend', i)" *ngIf="getStatusAction(data[1].status, 'suspend')" nz-menu-item>Valider la suspension</li>
+            <li (click)="tableAction('close_success', i)" *ngIf="getStatusAction(data[1].status, 'close_success')" nz-menu-item>Clôture avec success</li>
+            <li (click)="tableAction('close_failed', i)" *ngIf="getStatusAction(data[1].status, 'close_failed')" nz-menu-item>Clôture avec Echec</li>
+            <li (click)="tableAction('cancel_close', i)" *ngIf="getStatusAction(data[1].status, 'cancel_close')" nz-menu-item>InValider la clôture</li>
+          </ul>
+        </nz-dropdown-menu>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+</div>
